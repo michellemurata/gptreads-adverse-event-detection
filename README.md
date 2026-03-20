@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains code for automated detection of intraoperative adverse events from spine surgery operative reports using a large language model (GPT-4).
+This repository contains code for automated detection of intraoperative adverse events from spine surgery operative reports using a large language model (LLM).
 
 The system identifies:
 
@@ -11,7 +11,7 @@ The system identifies:
 
 This code accompanies the manuscript:
 
-**"GPT-4-Assisted Detection of Intraoperative Adverse Events from Spine Surgery Operative Reports: A Comparison with Human Reviewers"**
+> **“GPT-4-Assisted Detection of Intraoperative Adverse Events from Spine Surgery Operative Reports: A Comparison with Human Reviewers”**
 
 ---
 
@@ -21,17 +21,23 @@ Python 3.9 or higher
 
 Install dependencies:
 
+'''bash
 pip install -r requirements.txt
+'''
 
 ---
 
 ## API Access
 
-This project requires access to the OpenAI or Azure OpenAI API.
+This project requires access to the Azure OpenAI API.
 
-Set your API key:
+Set environment variables before running:
 
-export OPENAI_API_KEY=YOUR_API_KEY
+'''bash
+export AZURE_OPENAI_ENDPOINT=YOUR_ENDPOINT
+export AZURE_OPENAI_API_KEY=YOUR_API_KEY
+export AZURE_OPENAI_API_VERSION=2024-02-01
+'''
 
 ---
 
@@ -40,8 +46,7 @@ export OPENAI_API_KEY=YOUR_API_KEY
 Real operative notes cannot be shared due to patient privacy restrictions.
 
 A synthetic example dataset is provided:
-
-data/sample_notes.csv
+example_data/synthetic_oper_notes.csv
 
 Users may substitute their own dataset in the same format.
 
@@ -49,16 +54,29 @@ Users may substitute their own dataset in the same format.
 
 ## Running the Pipeline
 
-python src/run_pipeline.py --input data/sample_notes.csv --output results/predictions.csv
+From the repository root:
+
+'''bash
+python src/detect_adverse_events.py \
+  --input_csv example_data/synthetic_oper_notes.csv \
+  --output_csv results/sample_predictions.csv \
+  --prompt_name adverse_event
+'''
 
 ---
 
 ## Output
 
-The pipeline outputs:
+The pipeline produces a CSV file containing:
 
-- Durotomy classification (0/1)
-- Adverse event classification (text descriptor)
+- Predicted adverse event classification
+- Additional model response details
+
+---
+
+## Prompts
+
+Prompt templates are located in the prompts/ directory and can be modified for different classification tasks.
 
 ---
 
