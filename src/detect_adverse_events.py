@@ -6,8 +6,6 @@ from pathlib import Path
 import pandas as pd
 from openai import AzureOpenAI
 
-from prompts import DUROTOMY_PROMPT, ADVERSE_EVENT_PROMPT
-
 
 def clean_text_column(df: pd.DataFrame, text_column: str) -> pd.DataFrame:
     df = df.copy()
@@ -19,14 +17,22 @@ def clean_first_word(first_word: str) -> str:
     return first_word.replace(",", "").replace(".", "").strip()
 
 
-def get_prompt(prompt_name: str) -> str:
-    prompt_map = {
-        "durotomy": DUROTOMY_PROMPT,
-        "adverse_event": ADVERSE_EVENT_PROMPT,
+def load_prompt(prompt_name: str) -> str:
+    prompt_files = {
+        "durotomy": Path("prompts/durotomy_classification_prompt.txt"),
+        "adverse_event": Path("prompts/adverse_event_classification_prompt.txt"),
     }
-    if prompt_name not in prompt_map:
-        raise ValueError(f"Invalid prompt_name: {prompt_name}. Use one of {list(prompt_map.keys())}.")
-    return prompt_map[prompt_name]
+
+    if prompt_name not in prompt_files:
+        raise ValueError(
+            f"Invalid prompt_name: {prompt_name}. Use one of {list(prompt_files.keys())}."
+        )
+
+    prompt_path = prompt_files[prompt_name]
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+
+    return prompt_path.read_text(encoding="utf-8").strip()
 
 
 def build_client() -> AzureOpenAI:
@@ -56,11 +62,13 @@ def run_inference(
     sleep_seconds: float,
 ) -> None:
     client = build_client()
-    prompt = get_prompt(prompt_name)
+    prompt = load_prompt(prompt_name)
 
     notes = pd.read_csv(input_csv)
     if text_column not in notes.columns:
-        raise ValueError(f"Column '{text_column}' not found in input file. Found columns: {list(notes.columns)}")
+        raise ValueError(
+            f"Column '{text_column}' not found in input file. Found columns: {list(notes.columns)}"
+        )
 
     notes = clean_text_column(notes, text_column)
 
@@ -104,7 +112,9 @@ def run_inference(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run Azure OpenAI inference on operative notes.")
+    parser = argparse.ArgumentParser(
+        description="Run Azure OpenAI inference on operative notes."
+    )
     parser.add_argument("--input_csv", required=True, help="Path to input CSV file")
     parser.add_argument("--output_csv", required=True, help="Path to output CSV file")
     parser.add_argument(
