@@ -95,6 +95,7 @@ def run_inference(
 
         results.append(
             {
+                "NoteIndex": i,
                 "Prediction": clean_first_word(first_word),
                 "Details": details,
                 "RawResponse": response_text,
