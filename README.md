@@ -116,7 +116,7 @@ Results may vary across runs due to:
 
 If you use this code, please cite:
 
-Murata MA, et al.
+Nakatsuka MA, et al.
 GPT-4-Assisted Detection of Intraoperative Adverse Events from Spine Surgery Operative Reports: A Comparison with Human Reviewers.
 Neurosurgery Practice with Code, 2026.
 
